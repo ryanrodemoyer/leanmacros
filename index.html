@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeanMacros - Easy Fat-Loss Macro Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: #fff;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .unit {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            display: none;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        .macro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .macro-card {
+            background: #f8f9fb;
+            padding: 20px 15px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .macro-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .macro-card.calories {
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        }
+
+        .macro-card.protein {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+        }
+
+        .macro-card.carbs {
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+        }
+
+        .macro-card.fat {
+            background: linear-gradient(135deg, #d299c2, #fef9d7);
+        }
+
+        .macro-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .macro-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .macro-unit {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .explanation {
+            background: #f8f9fb;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            text-align: left;
+            margin-top: 25px;
+        }
+
+        .explanation-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .explanation ol {
+            color: #666;
+            line-height: 1.6;
+            padding-left: 20px;
+        }
+
+        .explanation li {
+            margin-bottom: 6px;
+        }
+
+        .reset-btn {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .reset-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .macro-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .macro-card {
+                padding: 15px 10px;
+            }
+
+            .macro-value {
+                font-size: 1.5rem;
+            }
+
+            input[type="number"] {
+                padding: 14px 18px;
+                font-size: 1rem;
+            }
+
+            .calculate-btn {
+                padding: 16px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-calculator"></i> LeanMacros
+        </div>
+        <div class="subtitle">Easiest Fat-Loss Macro Setup Ever</div>
+
+        <div class="input-group">
+            <label for="bodyweight">Your Body Weight</label>
+            <div class="input-wrapper">
+                <input type="number" id="bodyweight" placeholder="Enter your weight" min="1" step="0.1">
+                <span class="unit">lbs</span>
+            </div>
+            <div class="error" id="error">Please enter a valid weight</div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculateMacros()">
+            <i class="fas fa-magic"></i> Calculate My Macros
+        </button>
+
+        <div class="results" id="results">
+            <div class="results-title">Your Fat-Loss Macros</div>
+
+            <div class="macro-grid">
+                <div class="macro-card calories">
+                    <div class="macro-label">Daily Calories</div>
+                    <div class="macro-value" id="calories">0</div>
+                    <div class="macro-unit">calories</div>
+                </div>
+
+                <div class="macro-card protein">
+                    <div class="macro-label">Protein</div>
+                    <div class="macro-value" id="protein">0</div>
+                    <div class="macro-unit">grams</div>
+                </div>
+
+                <div class="macro-card carbs">
+                    <div class="macro-label">Carbs</div>
+                    <div class="macro-value" id="carbs">0</div>
+                    <div class="macro-unit">grams</div>
+                </div>
+
+                <div class="macro-card fat">
+                    <div class="macro-label">Fat</div>
+                    <div class="macro-value" id="fat">0</div>
+                    <div class="macro-unit">grams</div>
+                </div>
+            </div>
+
+            <button class="reset-btn" onclick="resetCalculator()">
+                <i class="fas fa-redo"></i> Calculate Again
+            </button>
+        </div>
+
+        <div class="explanation">
+            <div class="explanation-title">
+                <i class="fas fa-lightbulb"></i> How it works:
+            </div>
+            <ol>
+                <li>Bodyweight × 10 = Daily calories</li>
+                <li>Divide calories by 3 = Base macro split</li>
+                <li>Base ÷ 4 = Protein & carb grams</li>
+                <li>Base ÷ 9 = Fat grams</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function calculateMacros() {
+            const bodyweightInput = document.getElementById('bodyweight');
+            const bodyweight = parseFloat(bodyweightInput.value);
+            const errorElement = document.getElementById('error');
+            const resultsElement = document.getElementById('results');
+
+            // Clear previous error
+            errorElement.classList.remove('show');
+
+            // Validate input
+            if (!bodyweight || bodyweight <= 0) {
+                errorElement.classList.add('show');
+                resultsElement.classList.remove('show');
+                return;
+            }
+
+            // Calculate macros according to the requirements
+            const calories = Math.round(bodyweight * 10);
+            const baseValue = calories / 3;
+            const proteinAndCarbs = Math.round(baseValue / 4);
+            const fat = Math.round(baseValue / 9);
+
+            // Update the display
+            document.getElementById('calories').textContent = calories.toLocaleString();
+            document.getElementById('protein').textContent = proteinAndCarbs;
+            document.getElementById('carbs').textContent = proteinAndCarbs;
+            document.getElementById('fat').textContent = fat;
+
+            // Show results with animation
+            resultsElement.classList.add('show');
+
+            // Scroll to results on mobile
+            if (window.innerWidth <= 480) {
+                resultsElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function resetCalculator() {
+            document.getElementById('bodyweight').value = '';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('bodyweight').focus();
+        }
+
+        // Allow Enter key to calculate
+        document.getElementById('bodyweight').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                calculateMacros();
+            }
+        });
+
+        // Auto-focus on input when page loads
+        window.addEventListener('load', function () {
+            document.getElementById('bodyweight').focus();
+        });
+
+        // Add some interactive feedback
+        document.getElementById('bodyweight').addEventListener('input', function () {
+            const errorElement = document.getElementById('error');
+            if (errorElement.classList.contains('show')) {
+                errorElement.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+
+</html>
